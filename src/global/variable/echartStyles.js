@@ -15,7 +15,7 @@ const EChartStyle = {
         }
       },
       legend: {
-        show: false,
+        show: chartData.legend ? chartData.legend : false,
         x: "right",
         y: "top",
         right: '5%',

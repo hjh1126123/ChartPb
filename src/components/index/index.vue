@@ -5,30 +5,49 @@
     >
         <v-navigation-drawer
                 v-model="drawer"
-                fixed
-                clipped
-                app
+                :mini-variant="mini"
+                absolute
+                dark
+                temporary
         >
-            <v-list dense>
-                <v-list-tile v-for="item in items" :key="item.text" @click="">
+            <v-list class="pa-1">
+                <v-list-tile v-if="mini" @click.stop="mini = !mini">
+                    <v-list-tile-action>
+                        <v-icon>chevron_right</v-icon>
+                    </v-list-tile-action>
+                </v-list-tile>
+                <v-list-tile avatar tag="div">
+                    <v-list-tile-avatar>
+
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                        <v-list-tile-title>HJH</v-list-tile-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action>
+                        <v-btn icon @click.stop="mini = !mini">
+                            <v-icon>chevron_left</v-icon>
+                        </v-btn>
+                    </v-list-tile-action>
+                </v-list-tile>
+            </v-list>
+            <v-list class="pt-0" dense>
+                <v-divider light></v-divider>
+                <v-list-tile
+                        v-for="(item,index) in items"
+                        :key="index"
+                        @click="goRoute(item.url)"
+                >
                     <v-list-tile-action>
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-tile-action>
+
                     <v-list-tile-content>
-                        <v-list-tile-title>
-                            {{ item.text }}
-                        </v-list-tile-title>
+                        <v-list-tile-title>{{ item.text }}</v-list-tile-title>
                     </v-list-tile-content>
-                </v-list-tile>
-                <v-subheader class="mt-3 grey--text text--darken-1">相关配置</v-subheader>
-                <v-list-tile @click="">
-                    <v-list-tile-action>
-                        <v-icon color="grey darken-1">settings</v-icon>
-                    </v-list-tile-action>
-                    <v-list-tile-title class="grey--text text--darken-1">报表主题</v-list-tile-title>
                 </v-list-tile>
             </v-list>
         </v-navigation-drawer>
+
         <v-toolbar
                 dark
                 dense
@@ -40,9 +59,37 @@
             <v-toolbar-title class="mr-5 align-center">
                 <span class="title">海带宝数据监测系统</span>
             </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items class="hidden-sm-and-down">
+                <v-menu
+                        bottom
+                        origin="center center"
+                        transition="scale-transition"
+                >
+                    <v-btn
+                            slot="activator"
+                            dark
+                    >
+                        更多
+                    </v-btn>
+
+                    <v-list>
+                        <v-list-tile
+                                v-for="(item, i) in menuItems"
+                                :key="i"
+                                @click="item.clickFn"
+                        >
+                            <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+            </v-toolbar-items>
         </v-toolbar>
         <v-content>
-            <router-view></router-view>
+            <transition name="bounce" mode="out-in" enter-active-class="animated lightSpeedIn"
+                        leave-active-class="animated hinge">
+                <router-view></router-view>
+            </transition>
         </v-content>
     </v-app>
 </template>
@@ -53,10 +100,19 @@
         name: "App",
         data() {
             return {
-                drawer: true,
+                drawer: null,
+                mini: false,
                 items: [
-                    { icon: 'trending_up', text: '异常包裹' },
-                    { icon: 'trending_up', text: '财务' }
+                    {icon: 'trending_up', text: '异常包裹', url: '/exception'},
+                    {icon: 'trending_up', text: '财务', url: '/income'}
+                ],
+                menuItems:[
+                    {
+                        text : '退出登录',
+                        clickFn : click => {
+                            this.logout();
+                        }
+                    }
                 ],
                 timeString: "*年*月*日",
                 minHeight: 0,
@@ -68,7 +124,6 @@
         },
         watch: {
             '$route'(to, from) {
-                //    console.log('现在路由:',to.path.split('/')[1],'来自路由:',from.path.split('/')[1],'现在的动画:',this.transitionName)
                 const toDepth = to.path.split('/').length;
                 const fromDepth = from.path.split('/').length;
                 this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
@@ -76,12 +131,13 @@
         },
         created() {
             this.$nextTick(() => {
-                //  document.body.clientH
-                // $('[data-toggle="push-menu"]').pushMenu();
-                // var $pushMenu = $('[data-toggle="push-menu"]').data("lte.pushmenu");
+
             });
         },
         methods: {
+            goRoute(route) {
+                this.$router.push(route);
+            },
             getTime() {
                 const date = new Date();
                 this.timeString =
@@ -93,12 +149,11 @@
             },
             logout() {
                 sessionStorage.setItem('accessToken', '');
-            },
-            changeW() {
-                this.$store.state.isChangeW = !this.$store.state.isChangeW
+                this.$router.push('/login');
             }
         },
         activated() {
+
         },
         computed: {
             userName() {
@@ -125,131 +180,7 @@
         }
     };
 </script>
-<style scoped lang="stylus" rel="stylesheet/stylus">
-    .main-header {
-        position: relative;
-        max-height: 100px;
-        z-index: 1030;
-    }
+<style lang="stylus">
 
-    .main-header .logo {
-        -webkit-transition: width 0.3s ease-in-out;
-        -o-transition: width 0.3s ease-in-out;
-        transition: width 0.3s ease-in-out;
-        display: block;
-        float: left;
-        height: 50px;
-        font-size: 20px;
-        line-height: 50px;
-        text-align: center;
-        width: 230px;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        padding: 0 15px;
-        font-weight: 300;
-        overflow: hidden;
-    }
-
-    .main-header .navbar {
-        -webkit-transition: margin-left 0.3s ease-in-out;
-        -o-transition: margin-left 0.3s ease-in-out;
-        transition: margin-left 0.3s ease-in-out;
-        margin-bottom: 0;
-        margin-left: 230px;
-        border: none;
-        min-height: 50px;
-        border-radius: 0;
-    }
-
-    .main-header .logo .logo-lg {
-        display: block;
-    }
-
-    @media (max-width: 767px) {
-        .main-header .logo, .main-header .navbar {
-            width: 100%;
-            float: none;
-        }
-    }
-
-    @media (max-width: 767px) {
-        .main-header .navbar {
-            margin: 0;
-        }
-    }
-
-    .navbar-nav > li > .dropdown-menu {
-        width: auto;
-    }
-
-    .main-header .sidebar-toggle {
-        float: left;
-        background-color: transparent;
-        background-image: none;
-        padding: 15px 15px;
-        font-family: fontAwesome;
-    }
-
-    .main-header .sidebar-toggle:before {
-        content: '\f0c9';
-    }
-
-    .skin-blue .wrapper, .skin-blue .main-sidebar, .skin-blue .left-side {
-        background-color: #222d32;
-    }
-
-    .wrapper {
-        height: 100%;
-        position: relative;
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-
-    .main-sidebar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        padding-top: 50px;
-        min-height: 100%;
-        width: 230px;
-        z-index: 810;
-        -webkit-transition: -webkit-transform 0.3s ease-in-out, width 0.3s ease-in-out;
-        -moz-transition: -moz-transform 0.3s ease-in-out, width 0.3s ease-in-out;
-        -o-transition: -o-transform 0.3s ease-in-out, width 0.3s ease-in-out;
-        transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
-    }
-
-    .skin-blue .sidebar-menu > li.header {
-        color: #4b646f;
-        background: #1a2226;
-    }
-
-    .sidebar-form, .sidebar-menu > li.header {
-        overflow: hidden;
-        text-overflow: clip;
-        white-space: nowrap;
-    }
-
-    .sidebar-menu li.header {
-        padding: 10px 25px 10px 15px;
-        font-size: 12px;
-    }
-
-    .sidebar {
-        padding-bottom: 10px;
-    }
-
-    .sidebar-menu {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .router-link-active {
-        color: white;
-    }
-
-    .content-wrapper {
-        background-color: #42475d;
-    }
 </style>
 

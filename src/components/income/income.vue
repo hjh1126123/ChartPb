@@ -1,9 +1,3 @@
-<!--
- 父组件：当日收入  如果要echarts轮播，可以直接使用封装好的echarts.vue组件;
- bottomBarSwiper:swiper底部左边实例
- bottomBar2Swiper:swiper底部右边边实例
- tabList:轮播的banner["日本"，"美国"]
--->
 <template>
   <div class="income">
     <section class="content">
@@ -252,7 +246,6 @@
 
 
           $.$nextTick(function () {
-
             $.topBar = echarts.init($.$refs.topBar);
             setTimeout(() => {
               axios.post($.urlMonthlyIncome)
