@@ -1,10 +1,10 @@
 <template>
-    <v-container grid-list-md text-xs-center>
+    <v-container grid-list-md text-xs-center class="pt-1">
         <v-layout row wrap>
-            <v-flex v-for="(item,index) in tabList" :key="index" xs12 sm3 v-on:click="tabIndex = index">
-                <v-card color="#495060" class="white--text">
-                        <v-container grid-list-md text-xs-left text-sm-left>
-                            <v-layout row wrap justify-center>
+            <v-flex v-for="(item,index) in tabList" :key="index" xs12 sm3>
+                <v-card>
+                        <v-container grid-list-md text-xs-center text-sm-center class="pa-2">
+                            <v-layout row wrap>
                                 <v-flex xs6 sm6>
                                     <div>{{item.STName}}</div>
                                 </v-flex>
@@ -13,46 +13,69 @@
                                 </v-flex>
                             </v-layout>
                         </v-container>
-                        <v-divider light></v-divider>
-                        <v-card-actions>
+                    <v-divider></v-divider>
+                    <v-card-actions>
+                        <v-container grid-list-md text-xs-center class="pa-2">
                             <v-layout row wrap>
-                                <v-flex xs12 sm4>
-                                    <v-btn block outline>
-                                        <v-progress-linear  height="8" background-color="black" color="white" :value="Number(item.Percentage)"></v-progress-linear>
+                                <v-flex xs12 sm6>
+                                    <v-btn block>
+                                        <v-icon left>assessment</v-icon>
+                                        {{item.Dif}}件
                                     </v-btn>
                                 </v-flex>
-                                <v-flex xs12 sm8>
-                                    <v-layout row wrap>
-                                        <v-flex d-flex>
-                                            <v-layout row>
-                                                <v-flex xs12>
-                                                    <v-btn>
-                                                        <v-icon left>assessment</v-icon>
-                                                        {{item.Dif}}件
-                                                    </v-btn>
-                                                </v-flex>
-                                                <v-flex xs12>
-                                                    <v-btn>
-                                                        <v-icon left color="light-green accent-3"
-                                                                v-if="item.Rise === 'rise'">trending_up
-                                                        </v-icon>
-                                                        <v-icon left color="deep-orange darken-2"
-                                                                v-if="item.Rise === 'decline'">trending_down
-                                                        </v-icon>
-                                                        <v-icon left color="cyan accent-3"
-                                                                v-if="item.Rise === 'nochange'">trending_flat
-                                                        </v-icon>
-                                                        {{item.Percentage}}%
-                                                    </v-btn>
-                                                </v-flex>
-                                            </v-layout>
-                                        </v-flex>
-                                    </v-layout>
+                                <v-flex xs12 sm6>
+                                    <v-btn block>
+                                        <v-icon left color="light-green accent-3"
+                                                v-if="item.Rise === 'rise'">trending_up
+                                        </v-icon>
+                                        <v-icon left color="deep-orange darken-2"
+                                                v-if="item.Rise === 'decline'">trending_down
+                                        </v-icon>
+                                        <v-icon left color="cyan accent-3"
+                                                v-if="item.Rise === 'nochange'">trending_flat
+                                        </v-icon>
+                                        {{item.Percentage}}%
+                                    </v-btn>
+                                </v-flex>
+                                <v-flex xs12 sm12>
+                                    <v-progress-linear
+                                            height="5"
+                                            :value="item.Percentage"
+                                    ></v-progress-linear>
                                 </v-flex>
                             </v-layout>
-                        </v-card-actions>
-                    </v-card>
-                <v-btn block color="secondary" dark>显示此数据</v-btn>
+                        </v-container>
+                        <!--<v-container grid-list-md>-->
+                            <!--<v-layout justify-center align-center>-->
+                                <!--<v-flex xs12 sm12>-->
+                                    <!--<v-btn>-->
+                                        <!--<v-icon left>assessment</v-icon>-->
+                                        <!--{{item.Dif}}件-->
+                                    <!--</v-btn>-->
+                                    <!--<v-btn>-->
+                                        <!--<v-icon left color="light-green accent-3"-->
+                                                <!--v-if="item.Rise === 'rise'">trending_up-->
+                                        <!--</v-icon>-->
+                                        <!--<v-icon left color="deep-orange darken-2"-->
+                                                <!--v-if="item.Rise === 'decline'">trending_down-->
+                                        <!--</v-icon>-->
+                                        <!--<v-icon left color="cyan accent-3"-->
+                                                <!--v-if="item.Rise === 'nochange'">trending_flat-->
+                                        <!--</v-icon>-->
+                                        <!--{{item.Percentage}}%-->
+                                    <!--</v-btn>-->
+                                <!--</v-flex>-->
+                                <!--<v-flex xs12 sm12>-->
+                                    <!--<v-progress-linear-->
+                                            <!--color="secondary"-->
+                                            <!--height="2"-->
+                                            <!--value="50"-->
+                                    <!--&gt;</v-progress-linear>-->
+                                <!--</v-flex>-->
+                            <!--</v-layout>-->
+                        <!--</v-container>-->
+                    </v-card-actions>
+                </v-card>
             </v-flex>
         </v-layout>
         <index :exType="tabIndex"></index>

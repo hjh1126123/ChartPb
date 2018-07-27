@@ -24,11 +24,10 @@
                                             prepend-icon="lock"
                                             v-model="password"
                                             :append-icon="showPwd ? 'visibility_off' : 'visibility'"
-                                            :rules="[rules.required, rules.min]"
+                                            :rules="[rules.required]"
                                             :type="showPwd ? 'text' : 'password'"
                                             name="input-10-1"
                                             label="密 码"
-                                            hint="最 少 4 个 字 符"
                                             counter
                                             @click:append="showPwd = !showPwd"
                                     ></v-text-field>
@@ -74,8 +73,7 @@
                 v => (v && v.length <= 10) || '名称必须小于10个字符'
             ],
             rules: {
-                required: value => !!value || '不能为空.',
-                min: v => v.length >= 4 || '最少 4 个字符',
+                required: value => !!value || '不能为空.'
             },
             dark: false,
             vedioCanPlay: false,

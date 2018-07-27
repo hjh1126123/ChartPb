@@ -3,13 +3,19 @@ import Router from 'vue-router'
 
 Vue.use(Router);
 
-const Exception = () => import('../components/exception/exception'); //异常处理
-const Income = () => import('../components/income/income'); //异常处理
-const Login = () => import('../components/login/login'); //dengl
-const Index = () => import('../components/index/index'); //dengl
+const Login = () => import('../components/login/login');//登录页
 
+const Index = () => import('../components/index/index');//主页
+
+//子页
+const Exception = () => import('../components/exception/exception'); //异常处理
 const ExIndex = () =>
     import('../components/exception/child/index');//总的异常数
+
+const Income = () => import('../components/income/income'); //异常处理
+
+const Quantity = () => import('../components/quantity/quantity');
+
 
 export default new Router({
     routes: [
@@ -54,7 +60,15 @@ export default new Router({
                     meta: {
                         requiresAuth: true
                     }
-                }
+                },
+                {
+                    path: '/quantity',
+                    name: 'quantity',
+                    component: Quantity,
+                    meta: {
+                        requiresAuth: true
+                    }
+                },
             ]
         },
         {

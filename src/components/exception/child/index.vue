@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-tabs fixed-tabs v-model="active">
+        <v-tabs fixed-tabs v-model="active" v-if="tabList.length > 0">
             <v-tab v-for="(item,index) in tabList" :key="index" v-on:click="jumpByIndex(index)">
                 {{item | changeHouseName}}
             </v-tab>
@@ -8,8 +8,8 @@
         <v-container grid-list-md text-xs-center>
             <v-layout row wrap align-center justify-center fill-height class="bar">
                 <v-flex xs12 sm8>
-                    <swiper :options="swiperOption" ref="mySwiper">
-                        <swiper-slide v-for="(item,index) in chartList">
+                    <swiper :options="swiperOption" ref="mySwiper" v-if="chartList.length > 0">
+                        <swiper-slide v-for="(item,index) in chartList" :key="index">
                             <div v-if="item.HDBChartValues > 0" ref='bottomBar'></div>
                             <v-alert
                                     v-if="item.HDBChartValues <= 0"
@@ -42,13 +42,13 @@
                                 <td class="text-xs-left">{{ props.item.Total }}</td>
                                 <td class="text-xs-left">{{ props.item.Percentage }}%</td>
                                 <td class="text-xs-left">
-                                    <v-icon dark left color="light-green accent-3" v-if="props.item.Rise === 'rise'">
+                                    <v-icon left color="light-green accent-3" v-if="props.item.Rise === 'rise'">
                                         trending_up
                                     </v-icon>
-                                    <v-icon dark left color="deep-orange darken-2" v-if="props.item.Rise === 'decline'">
+                                    <v-icon left color="deep-orange darken-2" v-if="props.item.Rise === 'decline'">
                                         trending_down
                                     </v-icon>
-                                    <v-icon dark left color="cyan accent-3" v-if="props.item.Rise === 'nochange'">
+                                    <v-icon left color="cyan accent-3" v-if="props.item.Rise === 'nochange'">
                                         trending_flat
                                     </v-icon>
                                 </td>
@@ -153,7 +153,7 @@
                         data.xList.push(item.ModifyTime);
                         data.yList.push(item.Total);
                     });
-                    chart.setOption(this.GLOBAL.echartStyles.normalBar(data, echarts), false);
+                    chart.setOption(this.global.variable.echartStyles.normalBar(data, echarts), false);
                     window.addEventListener("resize", function () {
                         chart.resize();
                     });
