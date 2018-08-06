@@ -1,18 +1,18 @@
 <template>
     <div>
-        <v-tabs fixed-tabs v-model="active" v-if="tabList.length > 0">
+        <v-tabs fixed-tabs v-model="active" v-if="tabList.length > 0" class="animated fadeIn">
             <v-tab v-for="(item,index) in tabList" :key="index" v-on:click="jumpByIndex(index)">
                 {{item | changeHouseName}}
             </v-tab>
         </v-tabs>
         <v-container grid-list-md text-xs-center>
-            <v-layout row wrap align-center justify-center fill-height class="bar">
-                <v-flex xs12 sm8>
+            <v-layout row wrap align-center justify-center fill-height>
+                <v-flex xs12 sm8 v-on:mouseenter="barGo = false" v-on:mouseleave="barGo = true">
                     <swiper :options="swiperOption" ref="mySwiper" v-if="chartList.length > 0">
                         <swiper-slide v-for="(item,index) in chartList" :key="index">
-                            <div v-if="item.HDBChartValues > 0" ref='bottomBar'></div>
+                            <div v-if="item.HDBChartValues.length > 0" style="height: 450px;" ref='bottomBar'></div>
                             <v-alert
-                                    v-if="item.HDBChartValues <= 0"
+                                    v-else-if="item.HDBChartValues.length <= 0"
                                     :value="true"
                                     color="info"
                                     icon="info"
@@ -31,6 +31,7 @@
                             {{tabList[active] | changeHouseName}}
                         </v-card-title>
                         <v-data-table
+                                v-if="showList.length > 0"
                                 :headers="headers"
                                 :items="showList"
                                 hide-actions
@@ -42,10 +43,10 @@
                                 <td class="text-xs-left">{{ props.item.Total }}</td>
                                 <td class="text-xs-left">{{ props.item.Percentage }}%</td>
                                 <td class="text-xs-left">
-                                    <v-icon left color="light-green accent-3" v-if="props.item.Rise === 'rise'">
+                                    <v-icon left color="deep-orange accent-3" v-if="props.item.Rise === 'rise'">
                                         trending_up
                                     </v-icon>
-                                    <v-icon left color="deep-orange darken-2" v-if="props.item.Rise === 'decline'">
+                                    <v-icon left color="light-green" v-if="props.item.Rise === 'decline'">
                                         trending_down
                                     </v-icon>
                                     <v-icon left color="cyan accent-3" v-if="props.item.Rise === 'nochange'">
@@ -63,9 +64,6 @@
 <script>
     import echarts from "echarts";
 
-    import axios from "axios";
-    import {url, urlapi} from "../../../api/config.js";
-
     import "swiper/dist/css/swiper.css";
     import {swiper, swiperSlide} from "vue-awesome-swiper";
 
@@ -73,9 +71,7 @@
         data() {
             return {
                 swiperOption: {
-                    effect: 'flip',
                     allowTouchMove: false,
-                    loop: true,
                     navigation: {
                         nextEl: '.swiper-button-next',
                         prevEl: '.swiper-button-prev'
@@ -83,14 +79,17 @@
                     on: {
                         slideChangeTransitionStart: () => {
                             let $ = this;
-                            $.active = $.swiper.activeIndex;
-                            axios
-                                .post(urlapi + "/Ex/GetExPackageCount_TodayWithAWayhouse?CreateCenterCode=" + $.tabList[$.active])
-                                .then(res => {
-                                    $.showList = res.data;
-                                })
-                                .catch(err => {
-                                });
+                            if ($.swiper) {
+                                $.active = $.swiper.activeIndex;
+                                this.$store.state.requests.push(
+                                    $.$http
+                                        .post($.apiUrl + "/Ex/GetExPackageCount_TodayWithAWayhouse?CreateCenterCode=" + $.tabList[$.active])
+                                        .then(res => {
+                                            $.showList = res.data;
+                                        })
+                                        .catch(err => {
+                                        }));
+                            }
                         }
                     }
                 },
@@ -108,65 +107,111 @@
                 active: 0,
                 chartList: [],
                 showList: [],
-                tabList: []
+                tabList: [],
+                bottomBars: [],
+
+                barIndex: 0,
+                swiperIndex: 0,
+                barGo: true,
+
+                setTimeOutThisPage: [],
+                interValThisPage: []
             };
         },
         mounted() {
-            let $ = this;
-            $.$nextTick(() => {
-                this.getDataList($);
-            });
+            this.bindData(1);
         },
         methods: {
-            getDataList($) {
-                axios
-                    .post(urlapi + "/Ex/GetExPackageCount_twentyDay?ExType=" + $.exType)
+            bindData(exType) {
+                let $ = this;
+                this.$store.state.requests.push($.$http
+                    .post($.apiUrl + "/Ex/GetExPackageCount_twentyDay?ExType=" + exType)
                     .then(res => {
+                        $.tabList = [];
+                        $.bottomBars = [];
                         $.chartList = res.data;
-                        $.chartList.forEach(function (item, index) {
-                            $.tabList.push(item.CreateCenterCode);
-                            setTimeout(() => {
-                                if (item.HDBChartValues.length > 0) {
-                                    let bottomBar = echarts.init($.$refs.bottomBar[index]);
-                                    $.chartShowLoading(bottomBar);
-                                    $.setBar(bottomBar, res.data[index]);
-                                }
-                            }, 2000 * index);
-                        });
-                        axios
-                            .post(urlapi + "/Ex/GetExPackageCount_TodayWithAWayhouse?CreateCenterCode=" + $.tabList[$.active])
-                            .then(res => {
-                                $.showList = res.data;
-                            })
-                            .catch(err => {
-                                console.log(err);
+                        $.$nextTick(() => {
+                            $.chartList.forEach((item, index) => {
+                                $.tabList.push(item.CreateCenterCode);
+                                $.setTimeOutThisPage.push(setTimeout(() => {
+                                    $.bindBar($, item, index);
+                                }, 500 * index));
                             });
-                    });
+                            this.$store.state.requests.push($.$http
+                                .post($.apiUrl + "/Ex/GetExPackageCount_TodayWithAWayhouse?CreateCenterCode=" + $.tabList[$.active])
+                                .then(res => {
+                                    $.showList = res.data;
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                }));
+                            if ($.barInterVal) {
+                                clearInterval($.barInterVal);
+                                $.barInterVal = 0;
+                            }
+                            $.setTimeOutThisPage.push(setTimeout(() => {
+                                $.interValThisPage.push(setInterval(() => {
+                                    if ($.barInterVal === 0)
+                                        return;
+                                    if ($.barGo) {
+                                        if ($.barIndex > $.chartList[$.active].HDBChartValues.length - 1) {
+                                            if ($.swiper.activeIndex >= $.tabList.length - 1) {
+                                                $.jumpByIndex(0);
+                                            } else {
+                                                $.jumpByIndex($.swiper.activeIndex + 1);
+                                            }
+                                            $.barIndex = 0;
+                                        }
+                                        $.bottomBars[$.swiper.activeIndex].dispatchAction({
+                                            type: 'showTip',
+                                            seriesIndex: 0,
+                                            dataIndex: $.barIndex
+                                        });
+                                        $.barIndex++;
+                                    }
+                                }, 2000));
+                            }, 1000));
+                        });
+                    }));
             },
-            setBar(chart, resData) {
+            bindBar($, item, index) {
+                if (item.HDBChartValues.length > 0) {
+                    let bottomBar = echarts.init($.$refs.bottomBar[index]);
+                    $.chartShowLoading(bottomBar);
+                    setTimeout(() => {
+                        if (item.HDBChartValues.length > 0) {
+                            $.setBarData(bottomBar, item);
+                        }
+                    }, 1000 * index);
+                    $.bottomBars.push(bottomBar);
+                }
+            },
+            setBarData(chart, resData) {
+                let tmpCreateCenterCode = this.$options.filters.changeHouseName(resData.CreateCenterCode);
                 let data = {
                     xList: [],
-                    yList: []
+                    yList: [],
+                    title: tmpCreateCenterCode,
+                    childTitle: resData.STName,
+                    unit: '件'
                 };
                 if (resData.HDBChartValues.length > 0) {
                     resData.HDBChartValues.forEach(item => {
                         data.xList.push(item.ModifyTime);
                         data.yList.push(item.Total);
                     });
-                    chart.setOption(this.global.variable.echartStyles.normalBar(data, echarts), false);
+                    chart.setOption(this.global.variable.echartStyles.normalBar(data, echarts), true);
                     window.addEventListener("resize", function () {
                         chart.resize();
                     });
-                } else {
-
                 }
                 chart.hideLoading();
             },
             chartShowLoading(chart) {
                 chart.showLoading({
                     text: '图表载入中',
-                    color: '#ba38cc',
-                    textColor: '#d6921e',
+                    color: '#58cfff',
+                    textColor: '#ffffff',
                     maskColor: 'rgba(128, 128, 128, 0)',
                     zlevel: 0
                 });
@@ -174,35 +219,44 @@
             jumpByIndex(index) {
                 this.swiper.slideTo(index);
             }
-        },
+        }
+        ,
         computed: {
             swiper() {
                 return this.$refs.mySwiper.swiper;
             }
-        },
+        }
+        ,
         beforeDestroy() {
+            this.setTimeOutThisPage.forEach(function (item, index) {
+                clearTimeout(item);
+            });
+
+            this.interValThisPage.forEach(function (item, index) {
+                clearInterval(item);
+                item = 0;
+            });
+
+
             if (swiper) {
-                if (swiper.destroy && swiper.initialized === true) {
+                if (swiper.initialized === true) {
                     swiper.destroy();
                 }
             }
-        },
+        }
+        ,
         components: {
             swiper,
             swiperSlide,
             echarts
-        },
-        props: {
-            exType: {
-                type: Number,
-                default: 1
-            }
         }
-    };
+        ,
+        props: {}
+    }
+    ;
 </script>
 
 <style lang="stylus">
     .bar
-        min-height 400px;
         width 100%;
 </style>

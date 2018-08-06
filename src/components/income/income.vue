@@ -37,7 +37,8 @@
                                         v-on:mouseleave="intervalTransferCountryBarGo = true">
                                     <v-card-text class="text-xs-center">
                                         <h3>[{{tabTransferList[tabIndexTransferCountry]}}]转运收入/月</h3>
-                                        <v-tabs grow v-model="tabIndexTransferCountry" v-if="tabTransferList.length > 0">
+                                        <v-tabs grow v-model="tabIndexTransferCountry"
+                                                v-if="tabTransferList.length > 0">
                                             <v-tab v-for="(item,index) in tabTransferList" :key="index"
                                                    v-on:click="jumpByIndex(swiperTransferCountryMonthly,index)">
                                                 {{item}}
@@ -45,14 +46,13 @@
                                         </v-tabs>
                                     </v-card-text>
                                     <v-card-text>
-                                        <swiper :options="swiperOptionA" ref="bottomBarSwiper" v-if="tabTransferList.length > 0">
+                                        <swiper :options="swiperOptionA" ref="bottomBarSwiper"
+                                                v-if="tabTransferList.length > 0">
                                             <swiper-slide v-for="(item,index) in tabTransferList" :key="index">
                                                 <div style="width: 95%; height: 330px;" ref='bottomBar'></div>
                                             </swiper-slide>
-                                            <div class="swiper-pagination" slot="pagination"></div>
                                             <div class="swiper-button-prev" slot="button-prev"></div>
                                             <div class="swiper-button-next" slot="button-next"></div>
-                                            <div class="swiper-scrollbar" slot="scrollbar"></div>
                                         </swiper>
                                     </v-card-text>
                                 </v-card>
@@ -64,23 +64,23 @@
                                     <div style="width:100%;height: 130px;" ref="bottomPie">
                                     </div>
                                 </v-card>
-                                    <transition name="bounce" mode="out-in" enter-active-class="animated fadeIn"
-                                                leave-active-class="animated hinge">
-                                        <v-data-table
-                                                :headers="headersTransferCountry"
-                                                :items="TransferCountry"
-                                                hide-actions
-                                                class="elevation-1"
-                                                no-data-text="数据为空"
-                                                v-if="TransferCountry.length > 0"
-                                        >
-                                            <template slot="items" slot-scope="props">
-                                                <td class="caption text-xs-left">{{ props.item.name }}</td>
-                                                <td class="caption text-xs-left">{{ props.item.value }}</td>
-                                                <td class="caption text-xs-left">{{ props.item.percentage }}</td>
-                                            </template>
-                                        </v-data-table>
-                                    </transition>
+                                <transition name="bounce" mode="out-in" enter-active-class="animated fadeIn"
+                                            leave-active-class="animated hinge">
+                                    <v-data-table
+                                            :headers="headersTransferCountry"
+                                            :items="TransferCountry"
+                                            hide-actions
+                                            class="elevation-1"
+                                            no-data-text="数据为空"
+                                            v-if="TransferCountry.length > 0"
+                                    >
+                                        <template slot="items" slot-scope="props">
+                                            <td class="caption text-xs-left">{{ props.item.name }}</td>
+                                            <td class="caption text-xs-left">{{ props.item.value }}</td>
+                                            <td class="caption text-xs-left">{{ props.item.percentage }}</td>
+                                        </template>
+                                    </v-data-table>
+                                </transition>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -95,7 +95,8 @@
                                         v-on:mouseleave="intervalGenerationBuyBarGo = true">
                                     <v-card-text class="text-xs-center">
                                         <h3>[{{tabGenerationBuyList[tabIndexGenerationBuyCurrency]}}]代买收入/月</h3>
-                                        <v-tabs grow v-model="tabIndexGenerationBuyCurrency" v-if="tabGenerationBuyList.length > 0">
+                                        <v-tabs grow v-model="tabIndexGenerationBuyCurrency"
+                                                v-if="tabGenerationBuyList.length > 0">
                                             <v-tab v-for="(item,index) in tabGenerationBuyList" :key="index"
                                                    v-on:click="jumpByIndex(swiperGenerationBuyMonthly,index)">
                                                 {{item}}
@@ -103,14 +104,13 @@
                                         </v-tabs>
                                     </v-card-text>
                                     <v-card-text>
-                                        <swiper :options="swiperOptionB" ref="bottomBar2Swiper" v-if="tabGenerationBuyList.length > 0">
+                                        <swiper :options="swiperOptionB" ref="bottomBar2Swiper"
+                                                v-if="tabGenerationBuyList.length > 0">
                                             <swiper-slide v-for="(item,index) in tabGenerationBuyList" :key="index">
                                                 <div style="width: 95%;height: 330px;" ref='bottomBar2'></div>
                                             </swiper-slide>
-                                            <div class="swiper-pagination" slot="pagination"></div>
                                             <div class="swiper-button-prev" slot="button-prev"></div>
                                             <div class="swiper-button-next" slot="button-next"></div>
-                                            <div class="swiper-scrollbar" slot="scrollbar"></div>
                                         </swiper>
                                     </v-card-text>
                                 </v-card>
@@ -123,23 +123,22 @@
                                     </div>
                                 </v-card>
                                 <transition name="bounce" mode="out-in" enter-active-class="animated fadeIn"
-                                                leave-active-class="animated hinge">
-
-                                        <v-data-table
-                                                :headers="headersGenerationBuyCurrency"
-                                                :items="GenerationBuyCurrency"
-                                                hide-actions
-                                                class="elevation-1"
-                                                no-data-text="数据为空"
-                                                v-if="GenerationBuyCurrency.length > 0"
-                                        >
-                                            <template slot="items" slot-scope="props">
-                                                <td>{{ props.item.name }}</td>
-                                                <td class="text-xs-left">{{ props.item.value }}</td>
-                                                <td class="text-xs-left">{{ props.item.percentage }}</td>
-                                            </template>
-                                        </v-data-table>
-                                    </transition>
+                                            leave-active-class="animated hinge">
+                                    <v-data-table
+                                            :headers="headersGenerationBuyCurrency"
+                                            :items="GenerationBuyCurrency"
+                                            hide-actions
+                                            class="elevation-1"
+                                            no-data-text="数据为空"
+                                            v-if="GenerationBuyCurrency.length > 0"
+                                    >
+                                        <template slot="items" slot-scope="props">
+                                            <td>{{ props.item.name }}</td>
+                                            <td class="text-xs-left">{{ props.item.value }}</td>
+                                            <td class="text-xs-left">{{ props.item.percentage }}</td>
+                                        </template>
+                                    </v-data-table>
+                                </transition>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -152,10 +151,7 @@
     import "swiper/dist/css/swiper.css";
     import {swiper, swiperSlide} from "vue-awesome-swiper";
 
-    import axios from "axios";
     import echarts from "echarts";
-
-    import {url, urlapi} from "../../api/config.js";
 
     export default {
         data() {
@@ -217,12 +213,12 @@
                     {text: '占比', value: 'percentage'},
                 ],
 
-                urlMonthlyIncome: urlapi + '/Finance/MonthlyIncome',
-                urlTransferGenerationBuyProportion: urlapi + '/Finance/TransferGenerationBuyProportion',
-                urlTransferCountry: urlapi + '/Finance/TransferCountry',
-                urlGenerationBuyCurrency: urlapi + '/Finance/GenerationBuyCurrency',
-                urlTransferMonthly: urlapi + '/Finance/TransferMonthly?centerCode=',
-                urlGenerationBuyMonthly: urlapi + '/Finance/GenerationBuyMonthly?currency=',
+                urlMonthlyIncome: this.apiUrl + '/Finance/MonthlyIncome',
+                urlTransferGenerationBuyProportion: this.apiUrl + '/Finance/TransferGenerationBuyProportion',
+                urlTransferCountry: this.apiUrl + '/Finance/TransferCountry',
+                urlGenerationBuyCurrency: this.apiUrl + '/Finance/GenerationBuyCurrency',
+                urlTransferMonthly: this.apiUrl + '/Finance/TransferMonthly?centerCode=',
+                urlGenerationBuyMonthly: this.apiUrl + '/Finance/GenerationBuyMonthly?currency=',
 
                 xList: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
                 TransferCountry: [],
@@ -251,7 +247,9 @@
 
                 intervalGenerationBuyCircle: null,
                 intervalGenerationBuyCircleGo: true,
-                indexGenerationBuyCircle: 0
+                indexGenerationBuyCircle: 0,
+
+                setTimeOutInThisPage: []
             };
         },
         created() {
@@ -259,128 +257,159 @@
         },
         mounted: function () {
             let $ = this;
-            setTimeout(() => {
-                axios.all([this.TransferCountryAxios(), this.GenerationBuyCurrencyAxios()]).then(axios.spread(function (transferCountry, GenerationBuyCurrency) {
-                    setTimeout(() => {
-                        $.bottomCircleTransferCountry = echarts.init($.$refs.bottomPie);
-                        $.setBottomCircle($.bottomCircleTransferCountry, transferCountry.data, $.TransferCountry, 'Country', 'TotalCharge');
-                        $.bottomCircleGenerationBuy = echarts.init($.$refs.bottomPie2);
-                        $.setBottomCircle($.bottomCircleGenerationBuy, GenerationBuyCurrency.data, $.GenerationBuyCurrency, 'Currency', 'TotalPurchaseCharge');
+            $.setTimeOutInThisPage.push(setTimeout(() => {
+                $.$store.state.requests.push(
+                    $.$http.all([this.TransferCountryAxios(), this.GenerationBuyCurrencyAxios()]).then(
+                        $.$http.spread(
+                            function (transferCountry, GenerationBuyCurrency) {
+                                $.setTimeOutInThisPage.push(setTimeout(() => {
+                                    $.bottomCircleTransferCountry = echarts.init($.$refs.bottomPie);
+                                    $.setBottomCircle($.bottomCircleTransferCountry, transferCountry.data, $.TransferCountry, 'Country', 'TotalCharge');
+                                    $.bottomCircleGenerationBuy = echarts.init($.$refs.bottomPie2);
+                                    $.setBottomCircle($.bottomCircleGenerationBuy, GenerationBuyCurrency.data, $.GenerationBuyCurrency, 'Currency', 'TotalPurchaseCharge');
 
-                        setTimeout(() => {
-                            $.intervalTransferCountryCircle = setInterval(() => {
-                                if ($.intervalTransferCountryCircleGo) {
-                                    if ($.indexTransferCountryCircle > $.TransferCountry.length - 3)
-                                        $.indexTransferCountryCircle = 0;
-                                    $.CircleGo($.bottomCircleTransferCountry, $.indexTransferCountryCircle, $.TransferCountry.length);
-                                    $.indexTransferCountryCircle++;
-                                }
-                            }, 2000);
+                                    $.setTimeOutInThisPage.push(setTimeout(() => {
+                                        $.intervalTransferCountryCircle = setInterval(() => {
+                                            if ($.intervalTransferCountryCircle === 0)
+                                                return;
 
-                            $.intervalGenerationBuyCircle = setInterval(() => {
-                                if ($.intervalGenerationBuyCircleGo) {
-                                    if ($.indexGenerationBuyCircle > $.GenerationBuyCurrency.length - 3)
-                                        $.indexGenerationBuyCircle = 0;
-                                    $.CircleGo($.bottomCircleGenerationBuy, $.indexGenerationBuyCircle, $.GenerationBuyCurrency.length);
-                                    $.indexGenerationBuyCircle++;
-                                }
-                            }, 2000);
+                                            if ($.intervalTransferCountryCircleGo) {
+                                                if ($.indexTransferCountryCircle > $.TransferCountry.length - 3)
+                                                    $.indexTransferCountryCircle = 0;
+                                                $.CircleGo($.bottomCircleTransferCountry, $.indexTransferCountryCircle, $.TransferCountry.length);
+                                                $.indexTransferCountryCircle++;
+                                            }
+                                        }, 2000);
 
-                        }, 500);
-                    }, 2500);
-                    $.$nextTick(function () {
-                        $.topBar = echarts.init($.$refs.topBar);
-                        setTimeout(() => {
-                            axios.post($.urlMonthlyIncome)
-                                .then(res => {
-                                    let args = ['PayDate', 'TotalCharge'];
-                                    let opts = {
-                                        childTitle: '总收入',
-                                        xList: $.xList,
-                                        unit: '元人民币'
-                                    };
-                                    if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
-                                        $.setBar($.topBar, res, args, opts, {x: '15%'});
-                                    } else {
-                                        $.setBar($.topBar, res, args, opts, {x: '8%'});
-                                    }
+                                        $.intervalGenerationBuyCircle = setInterval(() => {
+                                            if ($.intervalGenerationBuyCircle === 0)
+                                                return;
+
+                                            if ($.intervalGenerationBuyCircleGo) {
+                                                if ($.indexGenerationBuyCircle > $.GenerationBuyCurrency.length - 3)
+                                                    $.indexGenerationBuyCircle = 0;
+                                                $.CircleGo($.bottomCircleGenerationBuy, $.indexGenerationBuyCircle, $.GenerationBuyCurrency.length);
+                                                $.indexGenerationBuyCircle++;
+                                            }
+                                        }, 2000);
+                                    }, 500));
+                                }, 2500));
+                                $.$nextTick(function () {
+                                    $.topBar = echarts.init($.$refs.topBar);
+                                    $.setTimeOutInThisPage.push(setTimeout(() => {
+                                        $.$store.state.requests.push(
+                                            $.$http.post($.urlMonthlyIncome)
+                                                .then(res => {
+                                                    let args = ['PayDate', 'TotalCharge'];
+                                                    let opts = {
+                                                        childTitle: '总收入',
+                                                        xList: $.xList,
+                                                        unit: '元人民币'
+                                                    };
+                                                    if ($.global.judge.global.isMobile()) {
+                                                        $.setBarData($.topBar, res, args, opts, {x: '15%'});
+                                                    } else {
+                                                        $.setBarData($.topBar, res, args, opts, {x: '8%'});
+                                                    }
+                                                }));
+                                    }, 500));
+
+                                    $.topCircle = echarts.init($.$refs.topPie);
+                                    $.setTimeOutInThisPage.push(setTimeout(() => {
+                                        $.setTopCircle($.topCircle, $.urlTransferGenerationBuyProportion);
+                                    }, 1500));
+
+                                    $.setTimeOutInThisPage.push(setTimeout(() => {
+                                        $.tabTransferList.forEach(function (item, index) {
+                                            $.setTimeOutInThisPage.push(setTimeout(() => {
+                                                let bottomBar = echarts.init($.$refs.bottomBar[index]);
+                                                $.$store.state.requests.push(
+                                                    $.$http.post($.urlTransferMonthly + item)
+                                                        .then(res => {
+                                                            let args = ['PayDate', 'TotalCharge'];
+                                                            let opts = {
+                                                                title: item,
+                                                                childTitle: '转运收入',
+                                                                xList: $.xList,
+                                                                unit: '元人民币'
+                                                            };
+                                                            $.setBarData(bottomBar, res, args, opts, {x: '15%'});
+                                                        }));
+                                            }, 2000 * index));
+                                        });
+                                        $.tabGenerationBuyList.forEach(function (item, index) {
+                                            $.setTimeOutInThisPage.push(setTimeout(() => {
+                                                let bottomBar = echarts.init($.$refs.bottomBar2[index]);
+                                                $.$store.state.requests.push(
+                                                    $.$http.post($.urlGenerationBuyMonthly + item)
+                                                        .then(res => {
+                                                            let args = ['Dates', 'TotalPurchaseCharge'];
+                                                            let opts = {
+                                                                title: item,
+                                                                childTitle: '代买收入',
+                                                                xList: $.xList,
+                                                                unit: '元人民币'
+                                                            };
+                                                            $.setBarData(bottomBar, res, args, opts, {x: '15%'});
+                                                        }));
+                                            }, 2000 * index));
+                                        });
+
+                                        $.swiperTransferCountryMonthly = $.$refs.bottomBarSwiper.swiper;
+                                        $.swiperGenerationBuyMonthly = $.$refs.bottomBar2Swiper.swiper;
+
+                                        $.intervalTransferCountryBar = setInterval(() => {
+                                            if ($.intervalTransferCountryBar === 0)
+                                                return;
+                                            if ($.intervalTransferCountryBarGo) {
+                                                if ($.swiperTransferCountryMonthly.activeIndex < $.tabTransferList.length - 1) {
+                                                    $.jumpByIndex($.swiperTransferCountryMonthly, ($.swiperTransferCountryMonthly.activeIndex + 1));
+                                                } else {
+                                                    $.jumpByIndex($.swiperTransferCountryMonthly, 0);
+                                                }
+                                            }
+                                        }, 5000);
+                                        $.intervalGenerationBuyBar = setInterval(() => {
+                                            if ($.intervalGenerationBuyBar === 0)
+                                                return;
+                                            if ($.intervalGenerationBuyBarGo) {
+                                                if ($.swiperGenerationBuyMonthly.activeIndex < $.tabGenerationBuyList.length - 1) {
+                                                    $.jumpByIndex($.swiperGenerationBuyMonthly, ($.swiperGenerationBuyMonthly.activeIndex + 1));
+                                                } else {
+                                                    $.jumpByIndex($.swiperGenerationBuyMonthly, 0);
+                                                }
+                                            }
+                                        }, 5000);
+                                    }, 2000));
                                 });
-                        }, 500);
-
-                        $.topCircle = echarts.init($.$refs.topPie);
-                        setTimeout(() => {
-                            $.setTopCircle($.topCircle, $.urlTransferGenerationBuyProportion);
-                        }, 1500);
-
-                        setTimeout(() => {
-                            $.tabTransferList.forEach(function (item, index) {
-                                setTimeout(() => {
-                                    let bottomBar = echarts.init($.$refs.bottomBar[index]);
-                                    axios.post($.urlTransferMonthly + item)
-                                        .then(res => {
-                                            let args = ['PayDate', 'TotalCharge'];
-                                            let opts = {
-                                                childTitle: '转运收入',
-                                                xList: $.xList,
-                                                unit: '元人民币'
-                                            };
-                                            $.setBar(bottomBar, res, args, opts, {x: '15%'});
-                                        });
-                                }, 2000 * index);
-                            });
-
-                            $.tabGenerationBuyList.forEach(function (item, index) {
-                                setTimeout(() => {
-                                    let bottomBar = echarts.init($.$refs.bottomBar2[index]);
-                                    axios.post($.urlGenerationBuyMonthly + item)
-                                        .then(res => {
-                                            let args = ['Dates', 'TotalPurchaseCharge'];
-                                            let opts = {
-                                                childTitle: '代买收入',
-                                                xList: $.xList,
-                                                unit: '元人民币'
-                                            };
-                                            $.setBar(bottomBar, res, args, opts, {x: '15%'});
-                                        });
-                                }, 2000 * index);
-                            });
-
-                            $.swiperTransferCountryMonthly = $.$refs.bottomBarSwiper.swiper;
-                            $.swiperGenerationBuyMonthly = $.$refs.bottomBar2Swiper.swiper;
-
-                            $.intervalTransferCountryBar = setInterval(() => {
-                                if ($.intervalTransferCountryBarGo) {
-                                    if ($.swiperTransferCountryMonthly.activeIndex < $.tabTransferList.length - 1) {
-                                        $.jumpByIndex($.swiperTransferCountryMonthly, ($.swiperTransferCountryMonthly.activeIndex + 1));
-                                    } else {
-                                        $.jumpByIndex($.swiperTransferCountryMonthly, 0);
-                                    }
-                                }
-                            }, 5000);
-                            $.intervalGenerationBuyBar = setInterval(() => {
-                                if ($.intervalGenerationBuyBarGo) {
-                                    if ($.swiperGenerationBuyMonthly.activeIndex < $.tabGenerationBuyList.length - 1) {
-                                        $.jumpByIndex($.swiperGenerationBuyMonthly, ($.swiperGenerationBuyMonthly.activeIndex + 1));
-                                    } else {
-                                        $.jumpByIndex($.swiperGenerationBuyMonthly, 0);
-                                    }
-                                }
-                            }, 5000);
-
-                        }, 2000);
-                    });
-                }));
-            }, 0);
+                            })));
+            }, 0));
         },
         beforeDestroy() {
-            if (this.intervalTransferCountryBar)
+            this.setTimeOutInThisPage.forEach(function (item, index) {
+                clearTimeout(item);
+            });
+
+            this.intervalTransferCountryBarGo = false;
+            this.intervalGenerationBuyBarGo = false;
+            this.intervalTransferCountryCircleGo = false;
+            this.intervalGenerationBuyCircleGo = false;
+            if (this.intervalTransferCountryBar) {
                 clearInterval(this.intervalTransferCountryBar);
-            if (this.intervalGenerationBuyBar)
+                this.intervalTransferCountryBar = 0;
+            }
+            if (this.intervalGenerationBuyBar) {
                 clearInterval(this.intervalGenerationBuyBar);
-            if (this.intervalTransferCountryCircle)
+                this.intervalGenerationBuyBar = 0;
+            }
+            if (this.intervalTransferCountryCircle) {
                 clearInterval(this.intervalTransferCountryCircle);
-            if (this.intervalGenerationBuyCircle)
+                this.intervalTransferCountryCircle = 0;
+            }
+            if (this.intervalGenerationBuyCircle) {
                 clearInterval(this.intervalGenerationBuyCircle);
+                this.intervalGenerationBuyCircle = 0;
+            }
             if (swiper) {
                 if (swiper.destroy && swiper.initialized === true) {
                     swiper.destroy();
@@ -388,15 +417,14 @@
             }
         },
         methods: {
-            //异步数据
             TransferCountryAxios: function () {
-                return axios.post(this.urlTransferCountry);
+                return this.$http.post(this.urlTransferCountry);
             },
             GenerationBuyCurrencyAxios: function () {
-                return axios.post(this.urlGenerationBuyCurrency);
+                return this.$http.post(this.urlGenerationBuyCurrency);
             },
             //图表构建
-            setBar(chart, res, args, opts, otherOpts) {
+            setBarData(chart, res, args, opts, otherOpts) {
                 let data = {};
                 data.xList = [];
                 data.yList = [];
@@ -413,7 +441,6 @@
                             data = Object.assign(data, otherOpts);
                         }
                     }
-                    console.log(data);
                     chart.setOption(this.global.variable.echartStyles.normalBar(data, echarts), false);
                     window.addEventListener("resize", function () {
                         chart.resize();
@@ -422,23 +449,24 @@
             },
             setTopCircle(chart, url) {
                 this.chartShowLoading(chart);
-                axios.post(url)
-                    .then(res => {
-                        if (res.data.length > 0) {
-                            let arr = this.PercentageA(res.data, ['转运', '代买'], ['TotalCharge', 'TotalPurchaseCharge']);
-                            let data = {
-                                chart: chart,
-                                data: arr,
-                                title: '总收入',
-                                childName: '总收入'
-                            };
-                            chart.hideLoading();
-                            chart.setOption(this.global.variable.echartStyles.normalCircle(data), false);
-                            window.addEventListener("resize", function () {
-                                chart.resize();
-                            });
-                        }
-                    });
+                this.$store.state.requests.push(
+                    this.$http.post(url)
+                        .then(res => {
+                            if (res.data.length > 0) {
+                                let arr = this.PercentageA(res.data, ['转运', '代买'], ['TotalCharge', 'TotalPurchaseCharge']);
+                                let data = {
+                                    chart: chart,
+                                    data: arr,
+                                    title: '总收入',
+                                    childName: '总收入'
+                                };
+                                chart.hideLoading();
+                                chart.setOption(this.global.variable.echartStyles.normalCircle(data), false);
+                                window.addEventListener("resize", function () {
+                                    chart.resize();
+                                });
+                            }
+                        }));
             },
             setBottomCircle(chart, data, dataList, dataListName, dataListValue, dataListTitle) {
                 let tmpDataList = this.CircleFormat(data, dataListName, dataListValue);
@@ -528,8 +556,10 @@
                 });
             },
             CircleStop(chart, index, max) {
-                chart.dispatchAction({type: 'downplay'});
-                chart.dispatchAction({type: 'pieUnSelect', dataIndex: index - 1 < 0 ? max - 2 : index - 1});
+                if (chart) {
+                    chart.dispatchAction({type: 'downplay'});
+                    chart.dispatchAction({type: 'pieUnSelect', dataIndex: index - 1 < 0 ? max - 2 : index - 1});
+                }
             },
             //ehcarts扩展
             chartShowLoading(chart) {

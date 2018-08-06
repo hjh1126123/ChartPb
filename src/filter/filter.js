@@ -1,7 +1,9 @@
 const conversion = {
   changeHouseName: function (name) {
     let str = "";
-    name = name.replace(/^\s+|\s+$/gm, '')
+    if(!name)
+      return;
+    name = name.replace(/^\s+|\s+$/gm, '');
     let names = name.toUpperCase();
     switch (names) {
       case "AUDB":
