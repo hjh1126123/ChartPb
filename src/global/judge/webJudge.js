@@ -1,4 +1,4 @@
-const global = {
+const webJudge = {
     isMobile: function () {
         return navigator
             .userAgent
@@ -6,4 +6,4 @@ const global = {
     }
 };
 
-export default global;
+export default webJudge;

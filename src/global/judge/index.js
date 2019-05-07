@@ -1,7 +1,7 @@
-import global from './global'
+import webJudge from './webJudge'
 
 const judge = {
-    global : global
+    webJudge : webJudge
 };
 
 export default judge;

@@ -25,7 +25,7 @@
                                             prepend-icon="person"
                                             v-model="username"
                                             :rules="nameRules"
-                                            :counter="10"
+                                            :counter="50"
                                             label="用户名"
                                             required>
                                     </v-text-field>
@@ -70,8 +70,6 @@
     </v-app>
 </template>
 <script>
-    import qs from "qs";
-
     export default {
         data: () => ({
             username: "",
@@ -83,7 +81,7 @@
             showPwd: false,
             nameRules: [
                 v => !!v || '不能为空',
-                v => (v && v.length <= 10) || '名称必须小于10个字符'
+                v => (v && v.length <= 50) || '名称必须小于50个字符'
             ],
             rules: {
                 required: value => !!value || '不能为空.'
@@ -95,12 +93,14 @@
         }),
         mounted: function () {
             let $ = this;
-            if ($.global.judge.global.isMobile()) {
+            if ($.global.$judge.webJudge.isMobile()) {
                 $.showVideo = false;
                 $.dark = true;
             } else {
                 let myVid = $.$refs.my_video;
-                myVid.play();
+                setTimeout(function () {
+                    myVid.play();
+                },150);
                 myVid.ontimeupdate = function () {
                     if (this.currentTime > 15) {
                         $.dark = true;
@@ -113,40 +113,57 @@
                     }
                 };
             }
-
         },
         created() {
-            let that = this;
+            let $ = this;
             document.onkeydown = function (e) {
                 let keyNum = window.event ? e.keyCode : e.which;
                 if (keyNum === 13) {
-                    that.login();
+                    $.login();
                 }
             };
+            if (localStorage.getItem('key')) {
+                $.$store.dispatch('getDecryptCode');
+                if ($.global.$function.dateGet.calculateDiffTime($.$store.state.user.dateTime, $.global.$function.dateGet.getTimestamp()) < 7) {
+                    $.$http
+                        .get(`${$.apiUrl}/User/Check?userCode=${$.$store.state.user.name}&pwd=${$.$store.state.user.pwd}`)
+                        .then(res => {
+                            let data = res.data;
+                            if (data.Check) {
+                                sessionStorage.setItem("accessToken", true);
+                                sessionStorage.setItem("userName", $.$store.state.user.name);
+                                $.$router.push({
+                                    path: "/index"
+                                });
+                            }
+                        });
+                }
+            }
         },
         methods: {
             login() {
                 let $ = this;
                 if ($.$refs.form.validate()) {
                     $.btnLoading = true;
-                    let data = {
-                        userCode: $.username,
-                        pwd: $.password
-                    };
                     $.$store.state.isShowLoading = true;
                     $.$http
-                        .post($.apiUrl + "/User/Check?" + qs.stringify(data))
+                        .get(`${$.apiUrl}/User/Check?userCode=${$.username}&pwd=${$.password}`)
                         .then(res => {
                             let data = res.data;
                             if (data.Check) {
                                 sessionStorage.setItem("accessToken", true);
-                                sessionStorage.setItem("userName", this.username);
+                                sessionStorage.setItem("userName", $.username);
+                                $.$store.dispatch('setEncryptCode', {name: $.username, pwd: $.password});
                                 $.$router.push({
                                     path: "/index"
                                 });
                             } else {
                                 $.btnLoading = false;
-                                $.myAlert(data.Msg);
+                                if (data.Msg && data.Msg !== undefined && data.Msg !== '') {
+                                    $.myAlert(data.Msg);
+                                } else {
+                                    $.myAlert('未知错误');
+                                }
                             }
                         })
                         .catch(err => {
@@ -158,8 +175,7 @@
             },
             myAlert(text) {
                 let $ = this;
-                if (!$.alert)
-                {
+                if (!$.alert) {
                     $.alert = true;
                     $.alertText = text;
                 }
@@ -168,16 +184,14 @@
                     setTimeout(() => {
                         $.alert = true;
                         $.alertText = text;
-                    },500);
+                    }, 500);
                 }
             },
             canplay() {
                 this.vedioCanPlay = true
             }
         },
-        watch: {
-
-        }
+        watch: {}
     };
 </script>
 <style lang="stylus">
@@ -192,7 +206,6 @@
         height: 100%;
         top: 0;
         z-index: 0;
-        background: black;
         .videoStyle
             object-fit: fill;
             width: 100%;

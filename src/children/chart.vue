@@ -10,65 +10,122 @@
             return {
                 chartStyle: '',
                 tmpChart: null,
-                xData: null,
+                tmpDelay: 0,
+                dataLength: null,
+                initDelay: null,
+                interval: null,
                 carouselIndex: 0,
-                interval: null
+                loading: false
             }
         },
         mounted() {
-            let $ = this;
-            if ($.height)
-                $.chartStyle += 'height: ' + $.height + 'px;';
+            if (this.height)
+                this.chartStyle += 'height: ' + this.height + 'px;';
+            this.$nextTick(function () {
+                this.tmpChart = echarts.init(this.$refs.chart);
+            });
         },
         beforeDestroy() {
-            let $ = this;
+            if (this.interval)
+                window.clearTimeout(this.interval);
 
-            if ($.interval)
-                clearTimeout($.interval);
+            if (this.initDelay)
+                window.clearTimeout(this.initDelay);
+
+            if (this.tmpChart)
+                this.tmpChart.dispose();
+
+            this.chartStyle = null;
+            this.tmpChart = null;
+            this.dataLength = null;
+            this.initDelay = null;
+            this.interval = null;
+            this.carouselIndex = 0;
+            this.loading = false;
+
+            this.interval = null;
+            this.initDelay = null;
         },
         methods: {
-            chartInit(value) {
-                let $ = this;
-                let chart = $.$refs.chart;
-                $.tmpChart = echarts.init(chart);
-                $.chartShowLoading($.tmpChart);
-                setTimeout(() => {
-                    $.tmpChart.setOption(value);
-                    $.tmpChart.hideLoading();
-                    window.addEventListener("resize", function () {
-                        $.tmpChart.resize();
-                    });
-                    if ($.tmpChart.getOption().xAxis) {
-                        $.xData = $.tmpChart.getOption().xAxis[0].data;
+            //主方法层
+            //初始化图表
+            chartInit($, value) {
+                $.initDelay = setTimeout(() => {
+                    if ($ && !$._isDestroyed) {
+                        if ($.tmpChart)
+                            $.tmpChart.setOption(value, true);
+
+                        if($.carousel){
+                            $.dataLength = $.tmpChart.getOption().xAxis[0].data.length;
+                        }else if($.carousel_circle){
+                            $.dataLength = $.tmpChart.getOption().series[0].data.length;
+                        }else if($.carousel_crosswise){
+                            $.dataLength = $.tmpChart.getOption().yAxis[0].data.length;
+                        }
                     }
                 }, $.delay)
             },
+            //动画播放
+            foreachGo($) {
+                setTimeout(()=>{
+                    if ($.carousel) {
+                        if ($.pageIndex === $.nowPage)
+                            $.updateHandle($, $.hightLightNext);
+                    }
+                    else if ($.carousel_circle) {
+                        if ($.pageIndex === $.nowPage) {
+                            $.updateHandle($, $.hightLightNext_circle);
+                        }
+                    }
+                    else if ($.carousel_crosswise){
+                        if ($.pageIndex === $.nowPage) {
+                            $.updateHandle($, $.hightLightNext_crosswise);
+                        }
+                    }
+                },$.delay);
+            },
+            openLoad($) {
+                if (!$.loading && $.tmpChart) {
+                    $.chartShowLoading($.tmpChart);
+                    $.loading = true;
+                }
+            },
+            closeLoad($) {
+                if ($.loading && $.tmpChart) {
+                    $.tmpChart.hideLoading();
+                    $.loading = false;
+                }
+            },
+            //页跳转
+            jumpPage(index) {
+                this.$emit('jumpFunction', this.swiper, index)
+            },
+            //不变层
+            //定制图表载入画面
             chartShowLoading(chart) {
                 chart.showLoading({
                     text: '图表载入中',
-                    color: '#ba38cc',
-                    textColor: '#d6921e',
+                    color: '#218ccc',
+                    textColor: '#fbfff8',
                     maskColor: 'rgba(128, 128, 128, 0)',
                     zlevel: 0
                 });
             },
-            hightLightNext() {
-                let $ = this;
-                if ($.interval)
-                    clearTimeout($.interval);
+            //循环事件
+            updateHandle($, callBack) {
+                if ($.interval) {
+                    window.clearTimeout($.interval);
+                }
                 if ($.pageIndex === $.nowPage) {
                     $.interval = setTimeout(function () {
-                        if ($.xData && $.carouselRun) {
-                            $.tmpChart.dispatchAction({
-                                type: 'showTip',
-                                seriesIndex: 0,
-                                dataIndex: $.carouselIndex
-                            });
+                        if (($.dataLength) && $.carouselRun) {
+                            if (callBack) {
+                                callBack($);
+                            }
                             $.carouselIndex++;
-                            if ($.carouselIndex > $.xData.length) {
+                            if ($.carouselIndex > $.dataLength) {
                                 $.carouselIndex = 0;
-                                if($.swiper)
-                                {
+                                if ($.swiper) {
                                     if ($.nowPage >= $.swiper.slides.length - 1) {
                                         $.jumpPage(0);
                                     } else {
@@ -77,49 +134,104 @@
                                 }
                             }
                         }
-                        $.hightLightNext();
+                        $.updateHandle($, callBack);
                     }, $.carouselInterval);
                 } else {
                     if ($.interval)
                         clearTimeout($.interval);
                 }
             },
-            jumpPage(index) {
-                let $ = this;
-                this.$emit('jumpFunction', $.swiper, index)
+            //清零循环步数
+            clearCount() {
+                this.carouselIndex = 0;
+            },
+            //扩展层
+            hightLightNext($) {
+                if ($.tmpChart) {
+                    $.tmpChart.dispatchAction({
+                        type: 'showTip',
+                        seriesIndex: 0,
+                        dataIndex: $.carouselIndex
+                    });
+                }
+            },
+            hightLightNext_circle($) {
+                if ($.tmpChart) {
+                    $.tmpChart.dispatchAction({
+                        type: 'downplay',
+                        seriesIndex: 0,
+                        dataIndex: $.carouselIndex - 1 < 0 ? $.dataLength - 1 : $.carouselIndex - 1
+                    });
+                    $.tmpChart.dispatchAction({
+                        type: 'pieUnSelect',
+                        seriesIndex: 0,
+                        dataIndex: $.carouselIndex - 1 < 0 ? $.dataLength - 1 : $.carouselIndex - 1
+                    });
+                    $.tmpChart.dispatchAction({
+                        type: 'pieToggleSelect',
+                        seriesIndex: 0,
+                        dataIndex: $.carouselIndex
+                    });
+                    $.tmpChart.dispatchAction({
+                        type: 'highlight',
+                        seriesIndex: 0,
+                        dataIndex: $.carouselIndex
+                    });
+                }
+            },
+            hightLightNext_crosswise($) {
+                if ($.tmpChart) {
+                    $.tmpChart.dispatchAction({
+                        type: 'showTip',
+                        seriesIndex: 0,
+                        dataIndex: ($.dataLength -1 ) - $.carouselIndex
+                    });
+                }
+            },
+            //子组件接口
+            //清理图表
+            clearChart() {
+                if (this.tmpChart) {
+                    this.tmpChart.clear();
+                }
             }
         },
         watch: {
             'echartData'(value) {
-                let $ = this;
-                $.chartInit(value);
-                if ($.carousel) {
-                    if ($.pageIndex === $.nowPage)
-                        $.hightLightNext();
-                }
-                if($.toolTip){
-                    if($.tmpChart){
-                        console.log('展示toolTip');
-                        $.tmpChart.dispatchAction({
-                            type: 'showTip',
-                            name:  $.chartName
-                        });
-                        console.log($.chartName);
+                this.$nextTick(() => {
+                        this.carouselIndex = 0;
+                        this.clearChart();
+                        this.chartInit(this, value);
+                        this.foreachGo(this);
                     }
-                }
+                );
             },
             'nowPage'(value) {
-                let $ = this;
-                $.carouselIndex = 0;
-                if (value === $.pageIndex) {
-                    $.hightLightNext();
-                }else{
-                    if($.tmpChart)
-                    {
-                        $.tmpChart.dispatchAction({
-                            type: 'hideTip'
-                        });
+                this.$nextTick(() => {
+                    this.carouselIndex = 0;
+                    if (value === this.pageIndex) {
+                        this.foreachGo(this);
+                    } else {
+                        if (this.tmpChart) {
+                            this.tmpChart.dispatchAction({
+                                type: 'hideTip'
+                            });
+                        }
                     }
+                });
+            },
+            'carouselRun'(value) {
+                if (!value) {
+                    this.$nextTick(() => {
+                        if (this.tmpChart) {
+                            this.tmpChart.dispatchAction({
+                                type: 'downplay'
+                            });
+                            this.tmpChart.dispatchAction({
+                                type: 'pieUnSelect'
+                            });
+                        }
+                    });
                 }
             }
         },
@@ -134,9 +246,17 @@
             },
             delay: {
                 type: Number,
-                default: 0
+                default: 1000
             },
             carousel: {
+                type: Boolean,
+                default: false
+            },
+            carousel_crosswise: {
+                type: Boolean,
+                default: false
+            },
+            carousel_circle: {
                 type: Boolean,
                 default: false
             },
@@ -160,13 +280,9 @@
                 type: Number,
                 default: 0
             },
-            chartName : {
+            chartName: {
                 type: String,
-                default : ''
-            },
-            toolTip: {
-                type: Boolean,
-                default : false
+                default: ''
             }
         },
         components: {

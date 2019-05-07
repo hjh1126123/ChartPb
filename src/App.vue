@@ -6,12 +6,8 @@
 
 
 <script>
-import Loading from "./children/loading";
 export default {
-    name: "App",
-    components: {
-        Loading
-    }
+    name: "App"
 };
 </script>
 <style scoped lang="stylus" rel="stylesheet/stylus">

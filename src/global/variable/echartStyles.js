@@ -1,21 +1,44 @@
 const EChartStyle = {
     normalBar: function (chartData, echarts) {
         let mList = [];
+        let barColor = new echarts.graphic.LinearGradient(0, 0, 0, 1,
+            [
+                {
+                    offset: 0,
+                    color: ["rgba(17, 168, 171, 1)"]
+                },
+                {
+                    offset: 1,
+                    color: ["rgba(17, 168, 171, 0.1)"]
+                }
+            ]
+        );
+        let lineColor = new echarts.graphic.LinearGradient(
+            0,
+            0,
+            0,
+            1,
+            [
+                {
+                    offset: 0,
+                    color: ["rgba(30,255,171,1)"]
+                }
+            ]
+        );
         if (chartData.yList) {
             for (let data of chartData.yList) {
-                if(chartData.isArrary){
+                if (Array.isArray(data)) {
                     let tmpData = [];
                     tmpData.push(data[0]);
-                    tmpData.push(data[1]);
-
+                    tmpData.push(data[1] / 2);
                     mList.push(tmpData);
                 }
-                else{
+                else {
                     mList.push(data / 2);
                 }
             }
         }
-        return {
+        let option = {
             title: {
                 show: false,
                 text: chartData.title ? chartData.title : '',
@@ -51,15 +74,18 @@ const EChartStyle = {
                 axisPointer: {
                     type: "shadow"
                 },
+                textStyle: {
+                    align: 'left'
+                },
                 formatter: function (params) {
                     return (chartData.title ? '【' + chartData.title + '】'
                         + '</br>' : '')
-                        +  '时间：'
+                        + '【时间】：'
                         + params[0].axisValueLabel
                         + '</br>'
-                        + params[0].seriesName
-                        + ':'
-                        + (chartData.isArrary ? params[0].data[1] : params[0].data)
+                        + '【' + params[0].seriesName + '】'
+                        + '：'
+                        + params[0].data[1]
                         + (chartData.unit ? chartData.unit : '件');
                 },
                 extraCssText:
@@ -116,22 +142,7 @@ const EChartStyle = {
                     barWidth: "80%",
                     itemStyle: {
                         normal: {
-                            color: new echarts.graphic.LinearGradient(
-                                0,
-                                0,
-                                0,
-                                1,
-                                [
-                                    {
-                                        offset: 0,
-                                        color: ["rgba(17, 168, 171, 1)"]
-                                    },
-                                    {
-                                        offset: 1,
-                                        color: ["rgba(17, 168, 171, 0.1)"]
-                                    }
-                                ]
-                            ),
+                            color: barColor,
                             shadowColor: 'rgba(0, 0, 0, 0.3)',
                             shadowBlur: 20
                         },
@@ -147,35 +158,37 @@ const EChartStyle = {
                     data: mList,
                     itemStyle: {
                         normal: {
-                            color: new echarts.graphic.LinearGradient(
-                                0,
-                                0,
-                                0,
-                                1,
-                                [
-                                    {
-                                        offset: 0,
-                                        color: ["rgba(30,255,171,1)"]
-                                    }
-                                ]
-                            ),
+                            color: lineColor,
                             shadowColor: "rgba(0,0,0,0.1)",
                             shadowBlur: 10
                         }
                     }
                 }
             ]
-        }
+        };
+
+        barColor = null;
+        lineColor = null;
+
+        return option;
     },
     doubleBar: function (chartData, echarts) {
         let mList = [];
+        let total1 = 0;
+        let total2 = 0;
+        if (chartData.yList) {
+            chartData.yList.forEach((item) => {
+                total1 += Number(item[1]);
+            });
+        }
         if (chartData.yList2) {
-            for (let data of chartData.yList2) {
-                if(data <= 0)
-                    continue;
-
-                mList.push(data / 2);
-            }
+            chartData.yList2.forEach((item) => {
+                let tmpD = [];
+                tmpD.push(item[0]);
+                tmpD.push(item[1] / 2);
+                mList.push(tmpD);
+                total2 += Number(item[1]);
+            });
         }
         let blue = {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
@@ -204,6 +217,9 @@ const EChartStyle = {
                 position: function (params) {
                     return ["6%", "10%"];
                 },
+                textStyle: {
+                    align: 'left'
+                },
                 show: true,
                 zindex: 30,
                 axisPointer: {
@@ -212,13 +228,14 @@ const EChartStyle = {
                 formatter: function (params) {
                     let text = "";
                     text += (chartData.title ? '【' + chartData.title + '】' + '</br>' : '');
-                    text += '时间：' + params[0].axisValueLabel + '</br>';
-                    text += params[0].seriesName + ':' + params[0].data + (chartData.unit ? chartData.unit : '件') + '</br>';
-                    text += params[1].seriesName + ':' + params[1].data + (chartData.unit ? chartData.unit : '件') + '</br>';
+                    text += params[0] ? '【' + params[0].seriesName + '总数】：' + total1.toFixed(2) + (chartData.unit ? chartData.unit : '件') + '</br>' : '';
+                    text += params[1] ? '【' + params[1].seriesName + '总数】：' + total2.toFixed(2) + (chartData.unit ? chartData.unit : '件') + '</br>' : '';
+                    text += params[0] ? '【' + params[0].seriesName + params[0].axisValueLabel + '】' + '：' + params[0].data[1] + (chartData.unit ? chartData.unit : '件') + '</br>' : '';
+                    text += params[1] ? '【' + params[1].seriesName + params[0].axisValueLabel + '】' + '：' + params[1].data[1] + (chartData.unit ? chartData.unit : '件') + '</br>' : '';
                     return text;
                 },
                 extraCssText:
-                    "width:200px;height:auto;line-height:30px"
+                    "width:auto;height:auto;line-height:30px"
             },
             grid: {
                 left: '3%',
@@ -284,7 +301,7 @@ const EChartStyle = {
                 {
                     name: chartData.childTitle2 ? chartData.childTitle2 : '未知',
                     type: 'bar',
-                    data: chartData.yList2  ? chartData.yList2 : [],
+                    data: chartData.yList2 ? chartData.yList2 : [],
                     animationEasing: 'linear',
                     itemStyle: {
                         normal: puplor
@@ -318,24 +335,110 @@ const EChartStyle = {
                 }
             ]
         };
+
+        blue = null;
+        puplor = null;
+
+        return option;
+    },
+    crosswiseBar: function (chartData, echarts) {
+        let yTextColor = '#edf7ff';
+        let barColor = new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+            "offset": 0,
+            "color": "#3398DB"
+        }, {
+            "offset": 1,
+            "color": "#8589ec"
+        }], false);
+        let option = {
+            tooltip: {
+                trigger: "axis",
+                position: function (params) {
+                    return ["6%", "10%"];
+                },
+                show: true,
+                zindex: 30,
+                axisPointer: {
+                    type: "shadow"
+                },
+                textStyle: {
+                    align: 'left'
+                },
+                formatter: function (params) {
+                    return `国家：${params[0].seriesName}<br/>分组：${params[0].axisValue}<br/>数量：${params[0].value}`
+                }
+            },
+            grid: {
+                containLabel: true
+            },
+            yAxis: [{
+                type: 'category',
+                data: chartData.yList,
+                axisLine: {
+                    show: false
+                },
+                axisTick: {
+                    show: false,
+                    alignWithLabel: true
+                },
+                axisLabel: {
+                    textStyle: {
+                        color: yTextColor
+                    }
+                }
+            }],
+            xAxis: [{
+                type: 'value',
+                axisLine: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    show: false
+                },
+                splitLine: {
+                    show: false
+                }
+            }],
+            series: [{
+                name: chartData.name,
+                type: 'bar',
+                data: chartData.data,
+                barCategoryGap: '35%',
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'right',
+                        formatter: function (params) {
+                            return `${params.data.value}${chartData.unit ? chartData.unit : ''}`;
+                        },
+                        textStyle: {
+                            color: '#bcbfff'
+                        }
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        color: barColor
+                    }
+                }
+            }]
+        };
+        barColor = null;
         return option;
     },
     normalCircle: function (chartData) {
-        let scale = 0;
-        if(chartData.chart){
-            if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
-                scale = (chartData.chart.getWidth() * 0.6) / (chartData.chart.getWidth());
-            } else {
-                scale = (chartData.chart.getWidth() * 0.8) / (chartData.chart.getWidth());
-            }
-        }else{
-            scale = 0.5;
-        }
+        let scale = .6;
+        if (chartData.scale)
+            scale = chartData.scale;
+
         let rich = {
             value: {
                 color: "#59c4e6",
                 fontSize: 20 * scale,
-                padding: [5 * scale, 4  * scale],
+                padding: [5 * scale, 4 * scale],
                 align: 'center'
             },
             total: {
@@ -437,8 +540,8 @@ const EChartStyle = {
         let data = chartData.data;
         let option = {
             title: {
-                text: chartData.Title,
-                subtext: chartData.Total,
+                text: chartData.title,
+                subtext: chartData.subtext,
                 x: 'center',
                 y: 'center',
                 textStyle: {
@@ -506,6 +609,106 @@ const EChartStyle = {
         };
         return option;
     },
+    doubelCircle: function (chartData) {
+        let outTitle = chartData.outTitle ? chartData.outTitle : '未知';
+        let outData = chartData.outData ? chartData.outData : [];
+        let inTitle = chartData.inTitle ? chartData.inTitle : '未知';
+        let inData = chartData.inData ? chartData.inData : [];
+        let scale = chartData.scale ? chartData.scale : 1;
+
+        let option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            series: [
+                {
+                    name: inTitle,
+                    type: 'pie',
+                    selectedMode: 'single',
+                    radius: ['30%', '40%'],
+                    minAngle: 5,
+                    label: {
+                        normal: {
+                            show: false
+                        }
+                    },
+                    labelLine: {
+                        normal: {
+                            show: false,
+                            borderWidth: 1
+                        }
+                    },
+                    itemStyle: {
+                        color: (params) => {
+                            let r = 30 * Number((params.dataIndex * 0.5) + 1);
+                            let g = 50 * Number((params.dataIndex * 0.5) + 1);
+                            let b = 90 * Number((params.dataIndex * 0.5) + 1);
+                            return 'rgb(' + r + ',' + g + ',' + b + ')';
+                        },
+                        borderColor: '#fff'
+                    },
+                    data: inData
+                },
+                {
+                    name: outTitle,
+                    type: 'pie',
+                    selectedMode: 'single',
+                    radius: ['50%', '75%'],
+                    minAngle: 30,
+                    label: {
+                        normal: {
+                            formatter: function(params){
+                                return `{term|${params.name}}\n{childTerm|人数：${params.data.value2}}\n{childTerm|件量：${params.data.value}}`;
+                            },
+                            backgroundColor: '#eee',
+                            borderColor: 'rgb(199,86,83)',
+                            borderWidth: 1,
+                            borderRadius: 5,
+                            padding: [0, 20, 0, 20],
+                            color: '#000',
+                            shadowBlur: 3,
+                            shadowColor: '#888',
+                            shadowOffsetX: 0,
+                            lineHeight: 20,
+                            rich: {
+                                term: {
+                                    fontSize: 20 * scale,
+                                    color: 'rgb(199,86,83)',
+                                    align: 'center'
+                                },
+                                childTerm: {
+                                    fontSize: 15 * scale,
+                                    align: 'center',
+                                    color: '#7c8dd2'
+                                }
+                            }
+                        }
+                    },
+                    itemStyle: {
+                        color: (params) => {
+                            let r = 30 * Number((params.dataIndex * 0.3) + 1);
+                            let g = 50 * Number((params.dataIndex * 0.3) + 1);
+                            let b = 90 * Number((params.dataIndex * 0.3) + 1);
+                            return 'rgb(' + r + ',' + g + ',' + b + ')';
+                        },
+                        borderColor: '#fff'
+                    },
+                    labelLine: {
+                        normal: {
+                            show: true,
+                            lineStyle: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    data: outData
+                }
+            ]
+        };
+
+        return option;
+    },
     textureCircle: function (chartData) {
         let piePatternSrc = 'base64(image)';
 
@@ -532,7 +735,7 @@ const EChartStyle = {
                 selectedMode: 'single',
                 selectedOffset: 5,
                 clockwise: true,
-                minAngle : 10,
+                minAngle: 10,
                 label: {
                     normal: {
                         formatter: '{b} {per|{d}%}',
@@ -562,8 +765,9 @@ const EChartStyle = {
         return option;
     },
     normalRadar: function (chartData) {
+        let num = 0;
         let option = {
-            color : ['#e01f54','#ffaf51'],
+            color: ['#e01f54', '#ffaf51'],
             title: {
                 text: chartData.title ? chartData.title : '',
                 show: !!chartData.title
@@ -577,33 +781,34 @@ const EChartStyle = {
                 }
             },
             radar: {
+                center: ['50%', '60%'],
                 indicator: chartData.indicator
             },
             series: [{
                 name: chartData.name,
                 type: 'radar',
                 symbol: 'circle',
-                symbolSize : 10,
+                symbolSize: 10,
                 animationEasing: 'bounceIn',
-                data : [
+                data: [
                     {
-                        value : chartData.data1,
-                        name : chartData.name1,
+                        value: chartData.data1,
+                        name: chartData.name1,
                         lineStyle: {
-                            width : 3
+                            width: 3
                         }
                     },
                     {
-                        value : chartData.data2,
-                        name : chartData.name2,
+                        value: chartData.data2,
+                        name: chartData.name2,
                         lineStyle: {
-                            width : 3
+                            width: 3
                         }
                     }
                 ]
             }]
         };
-
+        num = 0;
         return option;
     }
 };

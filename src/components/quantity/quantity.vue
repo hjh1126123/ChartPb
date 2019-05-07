@@ -1,45 +1,73 @@
 <template>
-    <v-container grid-list-md text-xs-center text-sm-center class="pt-0">
+    <v-container grid-list-md text-xs-center text-sm-center>
         <v-layout row wrap>
-            <v-flex xs12 sm9>
-                <v-card>
-                    <v-card-text>
-                        <h4>年总件量月同比详情</h4>
+            <v-flex xs12 sm9 lg9>
+                <v-card :color="$store.state.color.CardColor"
+                        class="elevation-0">
+                    <v-card-text class="text-xs-center childTitle">
+                        <h3>总件量同比详情</h3>
                     </v-card-text>
-                    <v-card-text class="pa-0">
+                    <v-card-text class="pa-0"
+                                 v-on:mouseenter="topBarCarouselRun = false"
+                                 v-on:mouseleave="topBarCarouselRun = true">
                         <chart
                                 height="450"
                                 v-bind:echartData="topBarData"
                                 :delay="500"
                                 carousel
-                        ></chart>
+                                :carouselRun="topBarCarouselRun">
+                        </chart>
                     </v-card-text>
                 </v-card>
             </v-flex>
-            <v-flex xs12 sm3>
-                <v-card>
+            <v-flex xs12 sm3 lg3>
+                <v-card :color="$store.state.color.CardColor"
+                        class="elevation-0">
+                    <v-card-text class="text-xs-center childTitle">
+                        <h3>各仓件量占比图</h3>
+                    </v-card-text>
+                    <v-card-text>
+                        <table class="table">
+                            <tr>
+                                <td v-for="(item,index) in circleDataName" :key="index">
+                                    {{item}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td v-for="(item,index) in circleDataValue" :key="index">
+                                    {{item}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td v-for="(item,index) in circleDataValueP" :key="index">
+                                    {{item}}
+                                </td>
+                            </tr>
+                        </table>
+                    </v-card-text>
                     <v-card-text class="pa-0">
-                        <v-card-text>
-                            <h4>年总件量占比详情</h4>
-                        </v-card-text>
-                        <v-card class="pa-0">
+                        <v-card-text class="pa-0">
                             <chart
-                                    height="450"
+                                    height="348"
                                     v-bind:echartData="topCircleData"
                                     :delay="1000"
-                                    toolTip
-                                    chartName = "2017年件量"
-                            ></chart>
-                        </v-card>
+                                    carousel_circle
+                                    :carouselRun="topCircleCarouselRun"
+                                    chartName="2017年件量">
+                            </chart>
+                            <div class="FixedTable"></div>
+                        </v-card-text>
                     </v-card-text>
                 </v-card>
             </v-flex>
-            <v-flex xs12 sm6>
-                <v-card>
+            <v-flex xs12 sm6 lg6>
+                <v-card :color="$store.state.color.CardColor"
+                        class="elevation-0">
                     <v-card-text>
-                        <h4>各仓总件量月同比详情</h4>
+                        <h4 class="childTitle">各仓总件量月同比详情</h4>
                         <v-tabs fixed-tabs v-model="activeOnline" v-if="tabListOnline.length > 0"
-                                class="animated fadeIn">
+                                class="animated fadeIn"
+                                :color="$store.state.color.tabColor">
                             <v-tab v-for="(item,index) in tabListOnline" :key="index"
                                    v-on:click="jumpByIndex(swiperOnline,index)">
                                 {{item}}
@@ -55,12 +83,11 @@
                                        v-bind:echartData="onlineBarData[index]"
                                        :delay="(2000 * (index + 1))"
                                        carousel
-                                       :carouselRun = "onlineCarouselRun"
-                                       :nowPage = "activeOnline"
-                                       :pageIndex = "index"
-                                       :swiper = "swiperOnline"
-                                       @jumpFunction = "jumpByIndex"
-                                >
+                                       :carouselRun="onlineCarouselRun"
+                                       :nowPage="activeOnline"
+                                       :pageIndex="index"
+                                       :swiper="swiperOnline"
+                                       @jumpFunction="jumpByIndex">
                                 </chart>
                             </swiper-slide>
                             <div class="swiper-button-prev" slot="button-prev"></div>
@@ -69,12 +96,14 @@
                     </v-card-text>
                 </v-card>
             </v-flex>
-            <v-flex xs12 sm6>
-                <v-card>
+            <v-flex xs12 sm6 lg6>
+                <v-card :color="$store.state.color.CardColor"
+                        class="elevation-0">
                     <v-card-text>
-                        <h4>线下件量月详情</h4>
+                        <h4 class="childTitle">线下件量月详情</h4>
                         <v-tabs fixed-tabs v-model="activeOffline" v-if="tabListOffline.length > 0"
-                                class="animated fadeIn">
+                                class="animated fadeIn"
+                                :color="$store.state.color.tabColor">
                             <v-tab v-for="(item,index) in tabListOffline" :key="index"
                                    v-on:click="jumpByIndex(swiperOffline,index)">
                                 {{item}}
@@ -88,13 +117,13 @@
                                 <chart
                                         height="250"
                                         v-bind:echartData="offlineBarData[index]"
-                                       :delay="(2500 * (index + 1))"
+                                        :delay="(2500 * (index + 1))"
                                         carousel
-                                        :carouselRun = "offLineCarouselRun"
-                                        :nowPage = "activeOffline"
-                                        :pageIndex = "index"
-                                        :swiper = "swiperOffline"
-                                        @jumpFunction = "jumpByIndex"
+                                        :carouselRun="offLineCarouselRun"
+                                        :nowPage="activeOffline"
+                                        :pageIndex="index"
+                                        :swiper="swiperOffline"
+                                        @jumpFunction="jumpByIndex"
                                 ></chart>
                             </swiper-slide>
                             <div class="swiper-button-prev" slot="button-prev"></div>
@@ -108,22 +137,32 @@
 </template>
 
 <script>
+    import {mapState} from 'vuex'
+
     import echarts from "echarts";
 
     import "swiper/dist/css/swiper.css";
     import {swiper, swiperSlide} from "vue-awesome-swiper";
 
-    import {url, urlapi} from "../../api/config.js";
 
     import chart from '../../children/chart'
 
     export default {
         name: "quantity",
+        components: {
+            chart,
+            swiper,
+            swiperSlide
+        },
         data() {
             return {
-                xList: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                xList: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
                 tabListOnline: ['美国', '日本', '澳洲', '德国', '英国'],
-                tabListOffline: ['美国', '日本'],
+                tabListOffline: ['美国', '日本', '韩国', '澳洲'],
+
+                circleDataName: [],
+                circleDataValue: [],
+                circleDataValueP: [],
 
                 activeOnline: 0,
                 activeOffline: 0,
@@ -174,144 +213,178 @@
                     slidesPerGroup: 1
                 },
 
-                header: [
-                    {
-                        text: '国家',
-                        align: 'center',
-                        sortable: false,
-                        value: 'name'
-                    },
-                    {
-                        text: '数量(件)',
-                        value: 'value',
-                        align: 'center'
-                    }
-                ],
-                items: [],
+                topBarCarouselRun: true,
+                topCircleCarouselRun: true,
+                onlineCarouselRun: true,
+                offLineCarouselRun: true,
 
-                onlineCarouselRun : true,
-                offLineCarouselRun : true
+                axiosComplete: {
+                    QPOk: false,
+                    MQOk: false,
+                    OQOk: false
+                }
             }
         },
         mounted() {
-            let $ = this;
-            $.swiperOnline = $.$refs.OnlineBarSwiper.swiper;
-            $.swiperOffline = $.$refs.OfflineBarSwiper.swiper;
-            $.$nextTick(function () {
-                $.topBarBind($);
-                $.topRadarBind($);
-                $.onlineBarBind($);
-                $.offLineBarBind($);
+            this.swiperOnline = this.$refs.OnlineBarSwiper.swiper;
+            this.swiperOffline = this.$refs.OfflineBarSwiper.swiper;
+            this.$nextTick(function () {
+                this.topBarBind(this);
+                this.topCircleBind(this);
+                this.onlineBarBind(this);
+                this.offLineBarBind(this);
+                this.$emit('closeLoad');
             });
         },
-        components: {
-            chart,
-            swiper,
-            swiperSlide
+        beforeDestroy() {
+            if (this.swiperOnline)
+                this.swiperOnline.destroy();
+            if (this.swiperOffline)
+                this.swiperOffline.destroy();
+
+            this.xList = null;
+            this.tabListOnline = null;
+            this.tabListOffline = null;
+            this.circleDataName = null;
+            this.circleDataValue = null;
+            this.circleDataValueP = null;
+            this.topBarData = null;
+            this.topCircleData = null;
+            this.onlineBarData = null;
+            this.offlineBarData = null;
+            this.swiperOnline = null;
+            this.swiperOptionOnline = null;
+            this.swiperOffline = null;
+            this.swiperOptionOffline = null;
+            this.topBarCarouselRun = null;
+            this.topCircleCarouselRun = null;
+            this.onlineCarouselRun = null;
+            this.offLineCarouselRun = null;
+            this.axiosComplete = null;
+        },
+        computed: {
+            ...mapState({
+                this_year: (state) => state.app.this_year,
+                last_year: (state) => state.app.last_year
+            })
         },
         methods: {
             topBarBind($) {
-                $.$store.state.requests.push(
-                    $.$http
-                        .post($.apiUrl + "/Quantity/QuantityProportion")
-                        .then(res => {
-                            let data = res.data;
-                            let chartData = {
-                                xList: [],
-                                yList: [],
-                                yList2: []
-                            };
-                            data.forEach((item, index) => {
-                                chartData.xList.push(item.InMonth);
-                                chartData.childTitle = '2017年总件量';
-                                chartData.childTitle2 = '2018年总件量';
-                                chartData.yList.push(item.Elyq);
-                                chartData.yList2.push(item.Elyb);
-                            });
-                            $.topBarData = $.global.variable.echartStyles.doubleBar(chartData, echarts);
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        }));
+                $.$http
+                    .get($.apiUrl + "/Quantity/QuantityProportion")
+                    .then(res => {
+                        let data = res.data;
+                        let chartData = {
+                            title: '总件数',
+                            xList: $.xList,
+                            yList: [],
+                            yList2: [],
+                            childTitle: `${$.last_year}年`,
+                            childTitle2: `${$.this_year}年`,
+                            unit: '件'
+                        };
+                        data.forEach((item, index) => {
+                            let data1 = [];
+                            let data2 = [];
+                            data1.push(item.InMonth);
+                            data1.push(item.Elyq);
+                            data2.push(item.InMonth);
+                            if (item.Elyb)
+                                data2.push(item.Elyb);
+                            else
+                                data2.push(0);
+                            chartData.yList.push(data1);
+                            chartData.yList2.push(data2);
+                        });
+                        $.topBarData = $.global.$variable.echartStyles.doubleBar(chartData, echarts);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             },
-            topRadarBind($) {
-                $.$store.state.requests.push(
-                    $.$http
-                        .post($.apiUrl + "/Quantity/MonthlyQuantity")
-                        .then(res => {
-                            let data = res.data;
-                            let indicator = [];
-                            let seriesData1 = [];
-                            let seriesName1 = '2017年件量';
-                            let seriesData2 = [];
-                            let seriesName2 = '2018年件量';
+            topCircleBind($) {
+                $.$http
+                    .get($.apiUrl + "/Quantity/MonthlyQuantity")
+                    .then(res => {
+                        let data = res.data;
+                        let chartData = {
+                            data: []
+                        };
+                        let total = 0;
+                        data.forEach((item) => {
+                            total += Number(item.InCountThisYear);
+                        });
+                        data.forEach((item) => {
+                            $.circleDataName.push(item.CenterName);
+                            $.circleDataValue.push(item.InCountThisYear);
+                            $.circleDataValueP.push($.global.$function.calculator.ToFixed(((item.InCountThisYear) / total) * 100, 2) + '%');
 
-                            let Max = 0;
-                            data.forEach((item, index) => {
-                                if (Max < Number(item.InCountLastYear) || Max < Number(item.InCountThisYear)) {
-                                    Max = Number(item.InCountLastYear) > Number(item.InCountThisYear) ? Number(item.InCountLastYear) : Number(item.InCountThisYear);
-                                }
-                            });
-                            data.forEach((item, index) => {
-                                let tmpIndicator = {
-                                    name: item.CenterName,
-                                    max: Max
-                                };
-                                indicator.push(tmpIndicator);
-
-                                seriesData1.push(Number(item.InCountLastYear));
-                                seriesData2.push(Number(item.InCountThisYear));
-                            });
-                            let circleData = {
-                                legend: [seriesName1, seriesName2],
-                                indicator: indicator,
-                                data1: seriesData1,
-                                data2: seriesData2,
-                                name1: seriesName1,
-                                name2: seriesName2
+                            let tmpD = {
+                                name: {},
+                                value: {}
                             };
-                            $.topCircleData = $.global.variable.echartStyles.normalRadar(circleData);
-                        }));
+                            tmpD.name = item.CenterName;
+                            tmpD.value = Number(item.InCountThisYear);
+
+                            chartData.data.push(tmpD);
+                        });
+                        $.topCircleData = $.global.$variable.echartStyles.simpleCircle(chartData);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             },
             onlineBarBind($) {
                 $.tabListOnline.forEach(function (item, index) {
-                    $.$store.state.requests.push(
-                        $.$http
-                            .post($.apiUrl + '/Quantity/MonthlyWarehouseVolume?centerCode=' + item)
-                            .then(res => {
-                                let data = res.data;
-                                let chartData = {
-                                    title: item,
-                                    xList: [],
-                                    yList: [],
-                                    yList2: []
-                                };
-                                data.forEach((item, index) => {
-                                    chartData.xList.push(item.InMonth);
-                                    chartData.childTitle = '2017年总件量';
-                                    chartData.childTitle2 = '2018年总件量';
-                                    chartData.yList.push(item.Elyq);
-                                    chartData.yList2.push(item.Elyb);
-                                });
-                                $.onlineBarData.splice(index, 0, $.global.variable.echartStyles.doubleBar(chartData, echarts));
-                            })
-                            .catch(err => {
-                                console.log(err);
-                            }));
+                    $.$http
+                        .get($.apiUrl + '/Quantity/MonthlyWarehouseVolume?centerCode=' + item)
+                        .then(res => {
+                            let data = res.data;
+                            let chartData = {
+                                title: item + '总件量',
+                                xList: $.xList,
+                                yList: [],
+                                yList2: [],
+                                childTitle: `${$.last_year}年`,
+                                childTitle2: `${$.this_year}年`,
+                                unit: '件'
+                            };
+                            data.forEach((item, index) => {
+                                let data1 = [];
+                                let data2 = [];
+                                data1.push(item.InMonth);
+                                data1.push(item.Elyq);
+                                data2.push(item.InMonth);
+                                if (item.Elyb)
+                                    data2.push(item.Elyb);
+                                else
+                                    data2.push(0);
+                                chartData.yList.push(data1);
+                                chartData.yList2.push(data2);
+                            });
+
+                            $.onlineBarData.splice(index, 0, $.global.$variable.echartStyles.doubleBar(chartData, echarts));
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
                 });
             },
             offLineBarBind($) {
-                $.$store.state.requests.push(
-                    $.$http
-                        .post($.apiUrl + '/Quantity/OfflineAQuantity')
-                        .then(res => {
-                            let data = res.data;
-                            let xList = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-                            let data1 = [];
-                            let data2 = [];
-                            let dataArray = [];
-                            xList.forEach(function (itemX, index) {
-                                let hasValue = false;
+                $.$http
+                    .get($.apiUrl + '/Quantity/OfflineAQuantity')
+                    .then(res => {
+                        let data = res.data;
+
+                        let xList = $.xList;
+                        let data1 = [];
+                        let data2 = [];
+                        let data3 = [];
+                        let data4 = [];
+                        let dataArray = [];
+                        xList.forEach(function (itemX, index) {
+                            let hasValue = false;
+                            if (data) {
                                 data.forEach(function (itemD, index) {
                                     if (itemD.InDate === itemX) {
                                         let tmpData1 = [];
@@ -324,38 +397,53 @@
                                         tmpData2.push(itemD.Jpxx);
                                         data2.push(tmpData2);
 
+                                        let tmpData3 = [];
+                                        tmpData3.push(itemD.InDate);
+                                        tmpData3.push(itemD.Hgxx);
+                                        data3.push(tmpData3);
+
+                                        let tmpData4 = [];
+                                        tmpData4.push(itemD.InDate);
+                                        tmpData4.push(itemD.Auxx);
+                                        data4.push(tmpData4);
+
                                         hasValue = true;
                                     }
                                 });
-                                if (!hasValue) {
-                                    let tmpData1 = [];
-                                    tmpData1.push(itemX);
-                                    tmpData1.push(0);
-                                    data1.push(tmpData1);
+                            }
 
-                                    let tmpData2 = [];
-                                    tmpData2.push(itemX);
-                                    tmpData2.push(0);
-                                    data2.push(tmpData2);
+                            if (!hasValue) {
+                                let tmpData = [];
+                                tmpData.push(itemX);
+                                tmpData.push(0);
 
-                                    hasValue = true;
-                                }
-                            });
-                            dataArray.push(data1);
-                            dataArray.push(data2);
+                                data1.push(tmpData);
+                                data2.push(tmpData);
+                                data3.push(tmpData);
+                                data4.push(tmpData);
 
-                            $.tabListOffline.forEach(function (item, index) {
-                                let tmpChartData = {
-                                    title: item,
-                                    childTitle: '件量',
-                                    xList: xList,
-                                    yList: dataArray[index],
-                                    isArrary: true
-                                };
+                                hasValue = true;
+                            }
+                        });
+                        dataArray.push(data1);
+                        dataArray.push(data2);
+                        dataArray.push(data3);
+                        dataArray.push(data4);
 
-                                $.offlineBarData.push($.global.variable.echartStyles.normalBar(tmpChartData, echarts))
-                            });
-                        }));
+                        $.tabListOffline.forEach(function (item, index) {
+                            let tmpChartData = {
+                                title: item + '线下件量',
+                                childTitle: '件量',
+                                xList: xList,
+                                yList: dataArray[index],
+                                isArrary: true
+                            };
+                            $.offlineBarData.push($.global.$variable.echartStyles.normalBar(tmpChartData, echarts))
+                        });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             },
             jumpByIndex(swiper, index) {
                 swiper.slideTo(index);
